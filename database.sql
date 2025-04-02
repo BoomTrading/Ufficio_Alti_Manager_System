@@ -24,7 +24,6 @@ CREATE TABLE Ufficio_Mngmnt.employees (
     `employeeNumber` INTEGER NOT NULL AUTO_INCREMENT,
     `lastName` VARCHAR(50) NOT NULL,
     `firstName` VARCHAR(50) NOT NULL,
-    `extension` VARCHAR(10) NOT NULL,
     `email` VARCHAR(100) NOT NULL,
     `officeCode` VARCHAR(10) NOT NULL,
     `reportsTo` INTEGER DEFAULT NULL,
@@ -45,6 +44,7 @@ CREATE TABLE Ufficio_Mngmnt.admusers (
     `lastLogin` TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (`userId`)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 
 INSERT INTO Ufficio_Mngmnt.offices 
