@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${office.officeCode} ? 'Edit Office' : 'New Office'"></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        label {
+            display: flex;
+            flex-direction: column;
+        }
+        input, select {
+            padding: 5px;
+            margin-top: 5px;
+        }
+        .button {
+            padding: 10px;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 100px;
+        }
+        .save-button {
+            background-color: #4CAF50;
+        }
+        .back-button {
+            background-color: #008CBA;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 th:text="${office.officeCode} ? 'Edit Office' : 'New Office'"></h1>
+    <form th:action="${office.officeCode} ? @{/offices/update/{code}(code=${office.officeCode})} : @{/offices}" 
+          th:object="${office}" method="post">
+        <label>
+            Office Code:
+            <input type="text" th:field="*{officeCode}" th:readonly="${office.officeCode != null}"/>
+        </label>
+        <label>
+            City:
+            <input type="text" th:field="*{city}"/>
+        </label>
+        <label>
+            Phone:
+            <input type="text" th:field="*{phone}"/>
+        </label>
+        <label>
+            Address Line 1:
+            <input type="text" th:field="*{addressLine1}"/>
+        </label>
+        <label>
+            Address Line 2:
+            <input type="text" th:field="*{addressLine2}"/>
+        </label>
+        <label>
+            State:
+            <input type="text" th:field="*{state}"/>
+        </label>
+        <label>
+            Country:
+            <input type="text" th:field="*{country}"/>
+        </label>
+        <label>
+            Postal Code:
+            <input type="text" th:field="*{postalCode}"/>
+        </label>
+        <label>
+            Territory:
+            <input type="text" th:field="*{territory}"/>
+        </label>
+        <div class="actions">
+            <button type="submit" class="button save-button">Save</button>
+            <a th:href="@{/offices}" class="button back-button">Back</a>
+        </div>
+    </form>
+</body>
+</html>

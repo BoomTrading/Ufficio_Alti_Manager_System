@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${employee.employeeNumber} ? 'Edit Employee' : 'New Employee'"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container my-4">
+    <h1 class="mb-4" th:text="${employee.employeeNumber} ? 'Edit Employee' : 'New Employee'"></h1>
+
+    <!-- Form per creare o modificare un dipendente -->
+    <form th:action="${employee.employeeNumber} ? @{/employees/{id}(id=${employee.employeeNumber})} : @{/employees}" 
+          th:object="${employee}" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+        </div>
+        <div class="mb-3">
+            <label for="firstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" th:field="*{email}" required>
+        </div>
+        <div class="mb-3">
+            <label for="officeCode" class="form-label">Office Code</label>
+            <input type="text" class="form-control" id="officeCode" th:field="*{office.officeCode}" required>
+        </div>
+        <div class="mb-3">
+            <label for="reportsTo" class="form-label">Reports To (Employee ID)</label>
+            <input type="number" class="form-control" id="reportsTo" th:field="*{reportsTo?.employeeNumber}">
+        </div>
+        <div class="mb-3">
+            <label for="jobTitle" class="form-label">Job Title</label>
+            <input type="text" class="form-control" id="jobTitle" th:field="*{jobTitle}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a th:href="@{/employees}" class="btn btn-secondary">Cancel</a>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validazione Bootstrap
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,7 +1,41 @@
 docker run --name mysql-Ufficio_Mngmnt -v ~/Documents/docker-data/mysql-Ufficio_Mngmnt:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=blackfriday -p 3306:3306 -d mysql:8.0.41
 
--- Create database with new name
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `Ufficio_Mngmnt` 
+-- Create database with new name Convenzione snake_case per Hibernate che rompe i coglioni.
+/*  abella offices:
+officeCode → office_code
+
+addressLine1 → address_line1
+
+addressLine2 → address_line2
+
+postalCode → postal_code
+
+Tabella employees:
+employeeNumber → employee_number
+
+lastName → last_name
+
+firstName → first_name
+
+officeCode → office_code
+
+reportsTo → reports_to
+
+jobTitle → job_title
+
+Aggiornati anche gli indici e i vincoli (idx_reportsTo → idx_reports_to, idx_officeCode → idx_office_code).
+
+Tabella admusers:
+userId → user_id
+
+createdAt → created_at
+
+lastLogin → last_login
+====================================================================================================================
+ */
+
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `Ufficio_Mngmnt`
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Use the new database
@@ -9,61 +43,66 @@ USE Ufficio_Mngmnt;
 
 -- Create offices table
 CREATE TABLE Ufficio_Mngmnt.offices (
-    `officeCode` VARCHAR(10) NOT NULL,
+    `office_code` VARCHAR(10) NOT NULL,
     `city` VARCHAR(50) NOT NULL,
     `phone` VARCHAR(50) NOT NULL,
-    `addressLine1` VARCHAR(50) NOT NULL,
-    `addressLine2` VARCHAR(50) DEFAULT NULL,
+    `address_line1` VARCHAR(50) NOT NULL,
+    `address_line2` VARCHAR(50) DEFAULT NULL,
     `state` VARCHAR(50) DEFAULT NULL,
     `country` VARCHAR(50) NOT NULL,
-    `postalCode` VARCHAR(15) NOT NULL,
+    `postal_code` VARCHAR(15) NOT NULL,
     `territory` VARCHAR(10) NOT NULL,
-    PRIMARY KEY (`officeCode`)
+    PRIMARY KEY (`office_code`)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Create employees table
 CREATE TABLE Ufficio_Mngmnt.employees (
-    `employeeNumber` INTEGER NOT NULL AUTO_INCREMENT,
-    `lastName` VARCHAR(50) NOT NULL,
-    `firstName` VARCHAR(50) NOT NULL,
+    `employee_number` INTEGER NOT NULL AUTO_INCREMENT,
+    `last_name` VARCHAR(50) NOT NULL,
+    `first_name` VARCHAR(50) NOT NULL,
     `email` VARCHAR(100) NOT NULL,
-    `officeCode` VARCHAR(10) NOT NULL,
-    `reportsTo` INTEGER DEFAULT NULL,
-    `jobTitle` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`employeeNumber`),
-    KEY `idx_reportsTo` (`reportsTo`),
-    KEY `idx_officeCode` (`officeCode`),
-    CONSTRAINT `employees_ibfk_1` FOREIGN KEY (`reportsTo`) REFERENCES `employees` (`employeeNumber`) ON DELETE SET NULL,
-    CONSTRAINT `employees_ibfk_2` FOREIGN KEY (`officeCode`) REFERENCES `offices` (`officeCode`) ON DELETE RESTRICT
+    `office_code` VARCHAR(10) NOT NULL,
+    `reports_to` INTEGER DEFAULT NULL,
+    `job_title` VARCHAR(50) NOT NULL,
+    PRIMARY KEY (`employee_number`),
+    KEY `idx_reports_to` (`reports_to`),
+    KEY `idx_office_code` (`office_code`),
+    CONSTRAINT `employees_ibfk_1` FOREIGN KEY (`reports_to`) REFERENCES `employees` (`employee_number`) ON DELETE SET NULL,
+    CONSTRAINT `employees_ibfk_2` FOREIGN KEY (`office_code`) REFERENCES `offices` (`office_code`) ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Create admusers table
 CREATE TABLE Ufficio_Mngmnt.admusers (
-    `userId` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(50) NOT NULL UNIQUE,
-    `password` VARCHAR(255) NOT NULL, -- Increased length for hashed passwords
+    `password` VARCHAR(255) NOT NULL,
     `email` VARCHAR(100) NOT NULL UNIQUE,
-    `role` ENUM('USER', 'MANAGER', 'ADMIN') NOT NULL DEFAULT 'USER', -- Updated ENUM with 3 levels
-    `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `lastLogin` TIMESTAMP NULL DEFAULT NULL,
-    PRIMARY KEY (`userId`)
+    `role` ENUM('USER', 'MANAGER', 'ADMIN') NOT NULL DEFAULT 'USER',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `last_login` TIMESTAMP NULL DEFAULT NULL,
+    PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-
+/* ====================================================================================================================
+INSERTO INTO AGGIORNATO IN BASE SEASNAKE_CASE PER HIBERNATE  */
 
 INSERT INTO Ufficio_Mngmnt.offices 
-    (`officeCode`, `city`, `phone`, `addressLine1`, `addressLine2`, `state`, `country`, `postalCode`, `territory`) 
+    (`office_code`, `city`, `phone`, `address_line1`, `address_line2`, `state`, `country`, `postal_code`, `territory`) 
 VALUES
-    ('NYC01', 'New York', '+1 212 555 0101', 'Park Avenue 350', 'Penthouse Suite', 'NY', 'USA', '10022', 'NA'),
+    ('NYC01', 'New York', '+1 212 555 0101', 'Park Avenue 350', 'Penthouse', 'NY', 'USA', '10022', 'NA'),
     ('LON01', 'London', '+44 20 7946 0101', 'Mayfair Place 12', NULL, NULL, 'UK', 'W1J 8AJ', 'EMEA'),
-    ('PAR01', 'Paris', '+33 1 45 55 0101', 'Avenue des Champs-Élysées 75', NULL, NULL, 'France', '75008', 'EMEA'),
+    ('PAR01', 'Paris', '+33 1 45 55 0101', 'Champs-Élysées 75', NULL, NULL, 'France', '75008', 'EMEA'),
     ('TOK01', 'Tokyo', '+81 3 4567 0101', 'Ginza Chuo-ku 5-2', 'Sky Tower', NULL, 'Japan', '104-0061', 'APAC'),
-    ('DUB01', 'Dubai', '+971 4 567 0101', 'Sheikh Zayed Road 100', 'Burj Al Arab Office', NULL, 'UAE', '12345', 'MEA'),
+    ('DUB01', 'Dubai', '+971 4 567 0101', 'Sheikh Zayed Rd 100', 'Burj Office', NULL, 'UAE', '12345', 'MEA'),
     ('SIN01', 'Singapore', '+65 6222 0101', 'Marina Bay Sands 10', NULL, NULL, 'Singapore', '018956', 'APAC'),
-    ('HKG01', 'Hong Kong', '+852 2525 0101', 'Central Plaza 18', 'Harbour Road', NULL, 'Hong Kong', '999077', 'APAC'),
+    ('HKG01', 'Hong Kong', '+852 2525 0101', 'Central Plaza 18', 'Harbour Rd', NULL, 'Hong Kong', '999077', 'APAC'),
     ('MIL01', 'Milan', '+39 02 123 0101', 'Via Monte Napoleone 8', NULL, NULL, 'Italy', '20121', 'EMEA'),
-    ('SYD01', 'Sydney', '+61 2 9250 0101', 'Circular Quay 1', 'Opera House View', 'NSW', 'Australia', '2000', 'APAC'),
+    ('SYD01', 'Sydney', '+61 2 9250 0101', 'Circular Quay 1', 'Opera View', 'NSW', 'Australia', '2000', 'APAC'),
     ('ZUR01', 'Zurich', '+41 44 208 0101', 'Bahnhofstrasse 25', NULL, NULL, 'Switzerland', '8001', 'EMEA'),
     ('MIA01', 'Miami', '+1 305 555 0101', 'Ocean Drive 1500', 'Luxury Suite', 'FL', 'USA', '33139', 'NA'),
     ('MOS01', 'Moscow', '+7 495 123 0101', 'Red Square 3', NULL, NULL, 'Russia', '109012', 'EMEA'),
     ('BER01', 'Berlin', '+49 30 123 0101', 'Unter den Linden 77', NULL, NULL, 'Germany', '10117', 'EMEA'),
-    ('MAD01', 'Madrid', '+34 91 123 0101', 'Paseo de la Castellana 100', NULL, NULL, 'Spain', '28046', 'EMEA'),
+    ('MAD01', 'Madrid', '+34 91 123 0101', 'Castellana 100', NULL, NULL, 'Spain', '28046', 'EMEA'),
     ('ROM01', 'Rome', '+39 06 123 0101', 'Via Veneto 50', NULL, NULL, 'Italy', '00187', 'EMEA'),
     ('TOR01', 'Toronto', '+1 416 555 0101', 'Bay Street 200', NULL, 'ON', 'Canada', 'M5J 2J5', 'NA'),
     ('CHI01', 'Chicago', '+1 312 555 0101', 'Magnificent Mile 625', NULL, 'IL', 'USA', '60611', 'NA'),
@@ -75,13 +114,13 @@ VALUES
     ('JAK01', 'Jakarta', '+62 21 123 0101', 'Jalan Sudirman 45', NULL, NULL, 'Indonesia', '10250', 'APAC'),
     ('SHG01', 'Shanghai', '+86 21 123 0101', 'The Bund 12', NULL, NULL, 'China', '200001', 'APAC'),
     ('BEI01', 'Beijing', '+86 10 123 0101', 'Chaoyang District 88', NULL, NULL, 'China', '100020', 'APAC'),
-    ('IST01', 'Istanbul', '+90 212 123 0101', 'Bosphorus Avenue 10', NULL, NULL, 'Turkey', '34435', 'EMEA'),
+    ('IST01', 'Istanbul', '+90 212 123 0101', 'Bosphorus Ave 10', NULL, NULL, 'Turkey', '34435', 'EMEA'),
     ('CAI01', 'Cairo', '+20 2 123 0101', 'Nile Corniche 25', NULL, NULL, 'Egypt', '11511', 'MEA'),
     ('JNB01', 'Johannesburg', '+27 11 123 0101', 'Sandton Drive 5', NULL, 'GP', 'South Africa', '2196', 'MEA'),
     ('CPT01', 'Cape Town', '+27 21 123 0101', 'Waterfront 100', NULL, 'WC', 'South Africa', '8001', 'MEA'),
     ('BUA01', 'Buenos Aires', '+54 11 123 0101', 'Avenida 9 de Julio 50', NULL, NULL, 'Argentina', 'C1073', 'LATAM'),
     ('SCL01', 'Santiago', '+56 2 123 0101', 'Apoquindo 3000', NULL, NULL, 'Chile', '7550000', 'LATAM'),
-    ('MEX01', 'Mexico City', '+52 55 123 0101', 'Paseo de la Reforma 250', NULL, NULL, 'Mexico', '06690', 'LATAM'),
+    ('MEX01', 'Mexico City', '+52 55 123 0101', 'Reforma 250', NULL, NULL, 'Mexico', '06690', 'LATAM'),
     ('RIO01', 'Rio de Janeiro', '+55 21 123 0101', 'Copacabana 150', NULL, 'RJ', 'Brazil', '22070', 'LATAM'),
     ('SAO01', 'São Paulo', '+55 11 123 0101', 'Avenida Paulista 1000', NULL, 'SP', 'Brazil', '01311', 'LATAM'),
     ('LIM01', 'Lima', '+51 1 123 0101', 'Avenida Larco 500', NULL, NULL, 'Peru', '15074', 'LATAM'),
@@ -94,54 +133,56 @@ VALUES
     ('AMS01', 'Amsterdam', '+31 20 123 0101', 'Dam Square 10', NULL, NULL, 'Netherlands', '1012', 'EMEA'),
     ('BRU01', 'Brussels', '+32 2 123 0101', 'Grand Place 15', NULL, NULL, 'Belgium', '1000', 'EMEA'),
     ('VIE01', 'Vienna', '+43 1 123 0101', 'Stephansplatz 3', NULL, NULL, 'Austria', '1010', 'EMEA');
-INSERT INTO Ufficio_Mngmnt.employees 
-    (`lastName`, `firstName`, `extension`, `email`, `officeCode`, `reportsTo`, `jobTitle`) 
+
+    INSERT INTO Ufficio_Mngmnt.employees 
+    (`last_name`, `first_name`, `email`, `office_code`, `reports_to`, `job_title`) 
 VALUES
-    ('Dupont', 'Claire', 'x1001', 'claire.dupont@luxcorp.com', 'PAR01', NULL, 'Chief Executive Officer'),
-    ('Smith', 'Jonathan', 'x1002', 'jonathan.smith@luxcorp.com', 'NYC01', 1, 'Chief Financial Officer'),
-    ('Tanaka', 'Hiroshi', 'x1003', 'hiroshi.tanaka@luxcorp.com', 'TOK01', 1, 'Chief Operating Officer'),
-    ('Riva', 'Giulia', 'x1004', 'giulia.riva@luxcorp.com', 'MIL01', 2, 'VP of Finance'),
-    ('Al-Mansoori', 'Fatima', 'x1005', 'fatima.almansoori@luxcorp.com', 'DUB01', 3, 'VP of Operations'),
-    ('Wong', 'Li Mei', 'x1006', 'limei.wong@luxcorp.com', 'HKG01', 3, 'Director of Asia Operations'),
-    ('Johnson', 'Emily', 'x1007', 'emily.johnson@luxcorp.com', 'LON01', 2, 'Director of European Finance'),
-    ('Kaur', 'Priya', 'x1008', 'priya.kaur@luxcorp.com', 'SIN01', 6, 'Senior Manager'),
-    ('Schmidt', 'Klaus', 'x1009', 'klaus.schmidt@luxcorp.com', 'BER01', 7, 'Senior Analyst'),
-    ('Petrov', 'Alexei', 'x1010', 'alexei.petrov@luxcorp.com', 'MOS01', 7, 'Regional Manager'),
-    ('Lopez', 'Isabella', 'x1011', 'isabella.lopez@luxcorp.com', 'MAD01', 7, 'Marketing Director'),
-    ('Nguyen', 'Anh', 'x1012', 'anh.nguyen@luxcorp.com', 'BKK01', 6, 'Operations Manager'),
-    ('Sato', 'Yuki', 'x1013', 'yuki.sato@luxcorp.com', 'TOK01', 3, 'HR Director'),
-    ('Brown', 'Oliver', 'x1014', 'oliver.brown@luxcorp.com', 'SYD01', 2, 'Finance Manager'),
-    ('Müller', 'Sophie', 'x1015', 'sophie.muller@luxcorp.com', 'ZUR01', 7, 'Compliance Officer'),
-    ('Garcia', 'Mateo', 'x1016', 'mateo.garcia@luxcorp.com', 'MIA01', 2, 'Sales Director'),
-    ('Kim', 'Soo-Jin', 'x1017', 'soojin.kim@luxcorp.com', 'SEO01', 6, 'IT Manager'),
-    ('Rossi', 'Marco', 'x1018', 'marco.rossi@luxcorp.com', 'ROM01', 7, 'Legal Counsel'),
-    ('Chen', 'Weia', 'x1019', 'wei.chen@luxcorp.com', 'SHG01', 6, 'Project Manager'),
-    ('Taylor', 'Victoria', 'x1020', 'victoria.taylor@luxcorp.com', 'TOR01', 2, 'Risk Analyst'),
-    ('Hernandez', 'Diego', 'x1021', 'diego.hernandez@luxcorp.com', 'MEX01', 11, 'Regional Sales Manager'),
-    ('Leblanc', 'Julien', 'x1022', 'julien.leblanc@luxcorp.com', 'PAR01', 1, 'Strategy Consultant'),
-    ('Olsen', 'Lars', 'x1023', 'lars.olsen@luxcorp.com', 'OSL01', 7, 'Senior Developer'),
-    ('Patel', 'Aarav', 'x1024', 'aarav.patel@luxcorp.com', 'MUM01', 6, 'Data Scientist'),
-    ('Silva', 'Beatriz', 'x1025', 'beatriz.silva@luxcorp.com', 'SAO01', 11, 'Marketing Manager'),
-    ('Ivanov', 'Dmitri', 'x1026', 'dmitri.ivanov@luxcorp.com', 'MOS01', 10, 'Logistics Coordinator'),
-    ('Fischer', 'Anna', 'x1027', 'anna.fischer@luxcorp.com', 'VIE01', 7, 'HR Specialist'),
-    ('Yamamoto', 'Aiko', 'x1028', 'aiko.yamamoto@luxcorp.com', 'TOK01', 13, 'Executive Assistant'),
-    ('Davis', 'Ethan', 'x1029', 'ethan.davis@luxcorp.com', 'CHI01', 2, 'Financial Analyst'),
-    ('Moreau', 'Sophie', 'x1030', 'sophie.moreau@luxcorp.com', 'PAR01', 22, 'Brand Manager'),
-    ('Khan', 'Zara', 'x1031', 'zara.khan@luxcorp.com', 'DUB01', 5, 'Client Relations'),
-    ('Costa', 'Rafael', 'x1032', 'rafael.costa@luxcorp.com', 'RIO01', 11, 'Creative Director'),
-    ('Li', 'Jing', 'x1033', 'jing.li@luxcorp.com', 'BEI01', 6, 'Operations Analyst'),
-    ('Andersson', 'Erik', 'x1034', 'erik.andersson@luxcorp.com', 'STO01', 7, 'Systems Engineer'),
-    ('Martinez', 'Lucia', 'x1035', 'lucia.martinez@luxcorp.com', 'MAD01', 11, 'PR Specialist'),
-    ('Park', 'Min-Jae', 'x1036', 'minjae.park@luxcorp.com', 'SEO01', 17, 'Network Administrator'),
-    ('Verma', 'Rohan', 'x1037', 'rohan.verma@luxcorp.com', 'MUM01', 24, 'Business Analyst'),
-    ('Weber', 'Hans', 'x1038', 'hans.weber@luxcorp.com', 'BER01', 9, 'Account Manager'),
-    ('Santos', 'Camila', 'x1039', 'camila.santos@luxcorp.com', 'SAO01', 25, 'Event Coordinator'),
-    ('Zhang', 'Lei', 'x1040', 'lei.zhang@luxcorp.com', 'SHG01', 19, 'Supply Chain Manager'),
-    ('Jensen', 'Freya', 'x1041', 'freya.jensen@luxcorp.com', 'CPH01', 7, 'Content Strategist'),
-    ('Moreno', 'Sofia', 'x1042', 'sofia.moreno@luxcorp.com', 'LIM01', 11, 'Customer Success Manager'),
-    ('Dubois', 'Pierre', 'x1043', 'pierre.dubois@luxcorp.com', 'PAR01', 22, 'Product Manager'),
-    ('Nair', 'Aisha', 'x1044', 'aisha.nair@luxcorp.com', 'JNB01', 6, 'Training Specialist');
-INSERT INTO Ufficio_Mngmnt.admusers 
+    ('Dupont', 'Claire', 'claire.dupont@luxcorp.com', 'PAR01', NULL, 'Chief Executive Officer'),
+    ('Smith', 'Jonathan', 'jonathan.smith@luxcorp.com', 'NYC01', 1, 'Chief Financial Officer'),
+    ('Tanaka', 'Hiroshi', 'hiroshi.tanaka@luxcorp.com', 'TOK01', 1, 'Chief Operating Officer'),
+    ('Riva', 'Giulia', 'giulia.riva@luxcorp.com', 'MIL01', 2, 'VP of Finance'),
+    ('Al-Mansoori', 'Fatima', 'fatima.almansoori@luxcorp.com', 'DUB01', 3, 'VP of Operations'),
+    ('Wong', 'Li Mei', 'limei.wong@luxcorp.com', 'HKG01', 3, 'Director of Asia Operations'),
+    ('Johnson', 'Emily', 'emily.johnson@luxcorp.com', 'LON01', 2, 'Director of European Finance'),
+    ('Kaur', 'Priya', 'priya.kaur@luxcorp.com', 'SIN01', 6, 'Senior Manager'),
+    ('Schmidt', 'Klaus', 'klaus.schmidt@luxcorp.com', 'BER01', 7, 'Senior Analyst'),
+    ('Petrov', 'Alexei', 'alexei.petrov@luxcorp.com', 'MOS01', 7, 'Regional Manager'),
+    ('Lopez', 'Isabella', 'isabella.lopez@luxcorp.com', 'MAD01', 7, 'Marketing Director'),
+    ('Nguyen', 'Anh', 'anh.nguyen@luxcorp.com', 'BKK01', 6, 'Operations Manager'),
+    ('Sato', 'Yuki', 'yuki.sato@luxcorp.com', 'TOK01', 3, 'HR Director'),
+    ('Brown', 'Oliver', 'oliver.brown@luxcorp.com', 'SYD01', 2, 'Finance Manager'),
+    ('Müller', 'Sophie', 'sophie.muller@luxcorp.com', 'ZUR01', 7, 'Compliance Officer'),
+    ('Garcia', 'Mateo', 'mateo.garcia@luxcorp.com', 'MIA01', 2, 'Sales Director'),
+    ('Kim', 'Soo-Jin', 'soojin.kim@luxcorp.com', 'SEO01', 6, 'IT Manager'),
+    ('Rossi', 'Marco', 'marco.rossi@luxcorp.com', 'ROM01', 7, 'Legal Counsel'),
+    ('Chen', 'Wei', 'wei.chen@luxcorp.com', 'SHG01', 6, 'Project Manager'),
+    ('Taylor', 'Victoria', 'victoria.taylor@luxcorp.com', 'TOR01', 2, 'Risk Analyst'),
+    ('Hernandez', 'Diego', 'diego.hernandez@luxcorp.com', 'MEX01', 11, 'Regional Sales Manager'),
+    ('Leblanc', 'Julien', 'julien.leblanc@luxcorp.com', 'PAR01', 1, 'Strategy Consultant'),
+    ('Olsen', 'Lars', 'lars.olsen@luxcorp.com', 'OSL01', 7, 'Senior Developer'),
+    ('Patel', 'Aarav', 'aarav.patel@luxcorp.com', 'MUM01', 6, 'Data Scientist'),
+    ('Silva', 'Beatriz', 'beatriz.silva@luxcorp.com', 'SAO01', 11, 'Marketing Manager'),
+    ('Ivanov', 'Dmitri', 'dmitri.ivanov@luxcorp.com', 'MOS01', 10, 'Logistics Coordinator'),
+    ('Fischer', 'Anna', 'anna.fischer@luxcorp.com', 'VIE01', 7, 'HR Specialist'),
+    ('Yamamoto', 'Aiko', 'aiko.yamamoto@luxcorp.com', 'TOK01', 13, 'Executive Assistant'),
+    ('Davis', 'Ethan', 'ethan.davis@luxcorp.com', 'CHI01', 2, 'Financial Analyst'),
+    ('Moreau', 'Sophie', 'sophie.moreau@luxcorp.com', 'PAR01', 22, 'Brand Manager'),
+    ('Khan', 'Zara', 'zara.khan@luxcorp.com', 'DUB01', 5, 'Client Relations'),
+    ('Costa', 'Rafael', 'rafael.costa@luxcorp.com', 'RIO01', 11, 'Creative Director'),
+    ('Li', 'Jing', 'jing.li@luxcorp.com', 'BEI01', 6, 'Operations Analyst'),
+    ('Andersson', 'Erik', 'erik.andersson@luxcorp.com', 'STO01', 7, 'Systems Engineer'),
+    ('Martinez', 'Lucia', 'lucia.martinez@luxcorp.com', 'MAD01', 11, 'PR Specialist'),
+    ('Park', 'Min-Jae', 'minjae.park@luxcorp.com', 'SEO01', 17, 'Network Administrator'),
+    ('Verma', 'Rohan', 'rohan.verma@luxcorp.com', 'MUM01', 24, 'Business Analyst'),
+    ('Weber', 'Hans', 'hans.weber@luxcorp.com', 'BER01', 9, 'Account Manager'),
+    ('Santos', 'Camila', 'camila.santos@luxcorp.com', 'SAO01', 25, 'Event Coordinator'),
+    ('Zhang', 'Lei', 'lei.zhang@luxcorp.com', 'SHG01', 19, 'Supply Chain Manager'),
+    ('Jensen', 'Freya', 'freya.jensen@luxcorp.com', 'CPH01', 7, 'Content Strategist'),
+    ('Moreno', 'Sofia', 'sofia.moreno@luxcorp.com', 'LIM01', 11, 'Customer Success Manager'),
+    ('Dubois', 'Pierre', 'pierre.dubois@luxcorp.com', 'PAR01', 22, 'Product Manager'),
+    ('Nair', 'Aisha', 'aisha.nair@luxcorp.com', 'JNB01', 6, 'Training Specialist');
+
+    INSERT INTO Ufficio_Mngmnt.admusers 
     (`username`, `password`, `email`, `role`) 
 VALUES
     ('cdupont', '$2a$10$XURP2XUoS9o5b4xX8e1W9e8QzP7Xg0b1eXzL7z3L8z9L0z1L2z3L4', 'claire.dupont@luxcorp.com', 'ADMIN'),
@@ -188,6 +229,7 @@ VALUES
     ('smoreno', '$2a$10$XURP2XUoS9o5b4xX8e1W9e8QzP7Xg0b1eXzL7z3L8z9L0z1L2z3L4', 'sofia.moreno@luxcorp.com', 'USER'),
     ('pdubois', '$2a$10$XURP2XUoS9o5b4xX8e1W9e8QzP7Xg0b1eXzL7z3L8z9L0z1L2z3L4', 'pierre.dubois@luxcorp.com', 'USER'),
     ('anair', '$2a$10$XURP2XUoS9o5b4xX8e1W9e8QzP7Xg0b1eXzL7z3L8z9L0z1L2z3L4', 'aisha.nair@luxcorp.com', 'USER');
+
 
 
 

@@ -7,41 +7,38 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Entity
 @Table(name = "admusers")
 public class AdminUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
-    private Integer userId;
+    @Column(name = "user_id")
+    private Integer userId; // Mappa a user_id
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "username", nullable = false, unique = true, length = 50)
+    private String username; // Mappa a username
 
-    @Column(name = "password")
-    private String password;
+    @Column(name = "password", nullable = false, length = 255)
+    private String password; // Mappa a password
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "email", nullable = false, unique = true, length = 100)
+    private String email; // Mappa a email
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Role role;
+    @Column(name = "role", nullable = false)
+    private Role role; // Mappa a role
 
-    @Column(name = "createdAt")
-    private LocalDateTime createdAt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt; // Mappa a created_at
 
-    @Column(name = "lastLogin")
-    private LocalDateTime lastLogin;
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin; // Mappa a last_login
 
-    // Enum per il campo role
     public enum Role {
         USER, MANAGER, ADMIN
     }
-
 }

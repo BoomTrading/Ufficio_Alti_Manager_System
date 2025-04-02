@@ -1,6 +1,5 @@
 package com.example.Ufficio_Mngmnt.model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,27 +15,27 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "employeeNumber")
+    @Column(name = "employee_number")
     private Integer employeeNumber;
 
-    @Column(name = "lastName")
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "firstName")
+    @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "email")
     private String email;
 
     @ManyToOne
-    @JoinColumn(name = "officeCode")
+    @JoinColumn(name = "office_code")
     private Office office;
 
     @ManyToOne
-    @JoinColumn(name = "reportsTo")
+    @JoinColumn(name = "reports_to")
     private Employee reportsTo;
 
-    @Column(name = "jobTitle")
+    @Column(name = "job_title")
     private String jobTitle;
 
 }

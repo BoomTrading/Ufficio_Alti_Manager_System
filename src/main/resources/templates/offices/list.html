@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Office List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .button {
+            padding: 5px 10px;
+            text-decoration: none;
+            color: white;
+            border-radius: 3px;
+        }
+        .add-button {
+            background-color: #4CAF50;
+        }
+        .edit-button {
+            background-color: #008CBA;
+        }
+        .delete-button {
+            background-color: #f44336;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Office List</h1>
+    <a th:href="@{/offices/new}" class="button add-button">Add New Office</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Office Code</th>
+                <th>City</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Country</th>
+                <th>Territory</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="office : ${offices}">
+                <td th:text="${office.officeCode}"></td>
+                <td th:text="${office.city}"></td>
+                <td th:text="${office.phone}"></td>
+                <td th:text="${office.addressLine1} + (${office.addressLine2} ? ', ' + ${office.addressLine2} : '')"></td>
+                <td th:text="${office.country}"></td>
+                <td th:text="${office.territory}"></td>
+                <td>
+                    <a th:href="@{/offices/edit/{code}(code=${office.officeCode})}" class="button edit-button">Edit</a>
+                    <form th:action="@{/offices/delete/{code}(code=${office.officeCode})}" method="post" style="display:inline;">
+                        <button type="submit" class="button delete-button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

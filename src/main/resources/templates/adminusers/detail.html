@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin User Details</title>
+    <style>
+        dl { margin: 20px 0; }
+        dt { font-weight: bold; }
+        dd { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Admin User Details</h1>
+    <dl>
+        <dt>ID:</dt>
+        <dd th:text="${adminUser.userId}"></dd>
+        <dt>Username:</dt>
+        <dd th:text="${adminUser.username}"></dd>
+        <dt>Email:</dt>
+        <dd th:text="${adminUser.email}"></dd>
+        <dt>Role:</dt>
+        <dd th:text="${adminUser.role}"></dd>
+        <dt>Created At:</dt>
+        <dd th:text="${adminUser.createdAt}"></dd>
+        <dt>Last Login:</dt>
+        <dd th:text="${adminUser.lastLogin} ?: 'Never'"></dd>
+    </dl>
+    <a th:href="@{/adminusers}">Back to List</a>
+    <a th:href="@{/adminusers/edit/{id}(id=${adminUser.userId})}">Edit</a>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container my-4">
+    <h1 class="mb-4">Employee List</h1>
+    
+    <!-- Pulsante per aggiungere un nuovo dipendente -->
+    <a th:href="@{/employees/new}" class="btn btn-primary mb-3">Add New Employee</a>
+
+    <!-- Tabella dei dipendenti -->
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Email</th>
+                <th>Office Code</th>
+                <th>Reports To</th>
+                <th>Job Title</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="employee : ${employees}">
+                <td th:text="${employee.employeeNumber}"></td>
+                <td th:text="${employee.lastName}"></td>
+                <td th:text="${employee.firstName}"></td>
+                <td th:text="${employee.email}"></td>
+                <td th:text="${employee.office.officeCode}"></td>
+                <td th:text="${employee.reportsTo != null ? employee.reportsTo.employeeNumber : 'None'}"></td>
+                <td th:text="${employee.jobTitle}"></td>
+                <td>
+                    <a th:href="@{/employees/{id}(id=${employee.employeeNumber})}" class="btn btn-info btn-sm">View</a>
+                    <a th:href="@{/employees/edit/{id}(id=${employee.employeeNumber})}" class="btn btn-warning btn-sm">Edit</a>
+                    <form th:action="@{/employees/delete/{id}(id=${employee.employeeNumber})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${employees.isEmpty()}">
+                <td colspan="8" class="text-center">No employees found.</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

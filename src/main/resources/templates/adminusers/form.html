@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${adminUser.userId} ? 'Edit Admin User' : 'New Admin User'"></title>
+    <style>
+        label { display: block; margin: 10px 0; }
+        input, select { width: 200px; }
+        button { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1 th:text="${adminUser.userId} ? 'Edit Admin User' : 'Add New Admin User'"></h1>
+    <form th:action="${adminUser.userId} ? @{/adminusers/{id}(id=${adminUser.userId})} : @{/adminusers}" 
+          th:object="${adminUser}" method="post">
+        <label>
+            Username:
+            <input type="text" th:field="*{username}" th:readonly="${adminUser.userId != null}"/>
+        </label>
+        <label>
+            Password:
+            <input type="password" th:field="*{password}"/>
+        </label>
+        <label>
+            Email:
+            <input type="email" th:field="*{email}"/>
+        </label>
+        <label>
+            Role:
+            <select th:field="*{role}">
+                <option value="USER">User</option>
+                <option value="MANAGER">Manager</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+        </label>
+        <button type="submit">Save</button>
+    </form>
+    <a th:href="@{/adminusers}">Back to List</a>
+</body>
+</html>
