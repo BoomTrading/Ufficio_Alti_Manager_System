@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmployeeService {
@@ -14,23 +15,41 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    // Create
+    public Employee createEmployee(Employee employee) {
+        return employeeRepository.save(employee);
+    }
+
+    // Read (all)
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
 
-    public Employee getEmployeeById(Integer id) {
-        return employeeRepository.findById(id).orElse(null);
+    // Read (by ID)
+    public Optional<Employee> getEmployeeById(Integer employeeNumber) {
+        return employeeRepository.findById(employeeNumber);
     }
 
-    public List<Employee> getEmployeesByOffice(String officeCode) {
+    // Read (by office code)
+    public List<Employee> getEmployeesByOfficeCode(String officeCode) {
         return employeeRepository.findByOfficeOfficeCode(officeCode);
     }
 
-    public Employee saveEmployee(Employee employee) {
+    // Update
+    public Employee updateEmployee(Integer employeeNumber, Employee employeeDetails) {
+        Employee employee = employeeRepository.findById(employeeNumber)
+                .orElseThrow(() -> new RuntimeException("Employee not found with number: " + employeeNumber));
+        employee.setLastName(employeeDetails.getLastName());
+        employee.setFirstName(employeeDetails.getFirstName());
+        employee.setEmail(employeeDetails.getEmail());
+        employee.setOffice(employeeDetails.getOffice());
+        employee.setReportsTo(employeeDetails.getReportsTo());
+        employee.setJobTitle(employeeDetails.getJobTitle());
         return employeeRepository.save(employee);
     }
 
-    public void deleteEmployee(Integer id) {
-        employeeRepository.deleteById(id);
+    // Delete
+    public void deleteEmployee(Integer employeeNumber) {
+        employeeRepository.deleteById(employeeNumber);
     }
 }
