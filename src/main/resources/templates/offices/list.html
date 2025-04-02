@@ -2,48 +2,40 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Office List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .button {
-            padding: 5px 10px;
-            text-decoration: none;
-            color: white;
-            border-radius: 3px;
-        }
-        .add-button {
-            background-color: #4CAF50;
-        }
-        .edit-button {
-            background-color: #008CBA;
-        }
-        .delete-button {
-            background-color: #f44336;
-            border: none;
-            cursor: pointer;
+        .filter-badge {
+            font-size: 0.85rem;
+            margin-right: 5px;
         }
     </style>
 </head>
-<body>
-    <h1>Office List</h1>
-    <a th:href="@{/offices/new}" class="button add-button">Add New Office</a>
-    <table>
-        <thead>
+<body class="container my-4">
+    <h1 class="mb-4">Office List</h1>
+    
+    <!-- Active Filters -->
+    <div th:if="${search != null or filter != null}" class="mt-2 mb-3">
+        <span class="me-2">Active filters:</span>
+        <span th:if="${search}" class="badge bg-info filter-badge">
+            Search: <span th:text="${search}"></span>
+            <a th:href="@{/offices}" class="text-white ms-1"><i class="bi bi-x-circle"></i></a>
+        </span>
+        <span th:if="${filter}" class="badge bg-info filter-badge">
+            <span th:text="${filter + ': ' + value}"></span>
+            <a th:href="@{/offices}" class="text-white ms-1"><i class="bi bi-x-circle"></i></a>
+        </span>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a th:href="@{/offices/new}" class="btn btn-primary">Add New Office</a>
+        <span th:if="${!offices.isEmpty()}" class="text-muted">
+            Showing <span th:text="${offices.size()}"></span> offices
+        </span>
+    </div>
+    
+    <table class="table table-striped">
+        <thead class="thead-dark">
             <tr>
                 <th>Office Code</th>
                 <th>City</th>
@@ -57,19 +49,35 @@
         <tbody>
             <tr th:each="office : ${offices}">
                 <td th:text="${office.officeCode}"></td>
-                <td th:text="${office.city}"></td>
+                <td>
+                    <a th:href="@{/offices(filter='city',value=${office.city})}" 
+                       th:text="${office.city}" class="text-decoration-none"></a>
+                </td>
                 <td th:text="${office.phone}"></td>
                 <td th:text="${office.addressLine1} + (${office.addressLine2} ? ', ' + ${office.addressLine2} : '')"></td>
-                <td th:text="${office.country}"></td>
-                <td th:text="${office.territory}"></td>
                 <td>
-                    <a th:href="@{/offices/edit/{code}(code=${office.officeCode})}" class="button edit-button">Edit</a>
+                    <a th:href="@{/offices(filter='country',value=${office.country})}" 
+                       th:text="${office.country}" class="text-decoration-none"></a>
+                </td>
+                <td>
+                    <a th:href="@{/offices(filter='territory',value=${office.territory})}" 
+                       th:text="${office.territory}" class="text-decoration-none"></a>
+                </td>
+                <td>
+                    <a th:href="@{/offices/edit/{code}(code=${office.officeCode})}" class="btn btn-warning btn-sm">Edit</a>
                     <form th:action="@{/offices/delete/{code}(code=${office.officeCode})}" method="post" style="display:inline;">
-                        <button type="submit" class="button delete-button">Delete</button>
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
                     </form>
                 </td>
             </tr>
+            <tr th:if="${offices.isEmpty()}">
+                <td colspan="7" class="text-center">No offices found.</td>
+            </tr>
         </tbody>
     </table>
+    
+    <a th:href="@{/}" class="btn btn-secondary">Back to Home</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

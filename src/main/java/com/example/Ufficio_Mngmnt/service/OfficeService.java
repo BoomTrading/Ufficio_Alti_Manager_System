@@ -49,4 +49,24 @@ public class OfficeService {
     public void deleteOffice(String officeCode) {
         officeRepository.deleteById(officeCode);
     }
+    
+    // New search methods
+    public List<Office> searchOffices(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return getAllOffices();
+        }
+        return officeRepository.searchOffices(searchTerm.trim());
+    }
+    
+    public List<Office> findByCity(String city) {
+        return officeRepository.findByCityContainingIgnoreCase(city);
+    }
+    
+    public List<Office> findByCountry(String country) {
+        return officeRepository.findByCountryContainingIgnoreCase(country);
+    }
+    
+    public List<Office> findByTerritory(String territory) {
+        return officeRepository.findByTerritoryContainingIgnoreCase(territory);
+    }
 }

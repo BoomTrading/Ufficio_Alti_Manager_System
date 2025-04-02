@@ -10,35 +10,64 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/offices") // Modificato da /api/offices a /offices
+@RequestMapping("/offices")
 public class OfficeController {
 
     @Autowired
     private OfficeService officeService;
 
-    // Read (all) - Mostra la lista degli uffici
+    // Read (all) - Show office list with optional search
     @GetMapping
-    public String getAllOffices(Model model) {
-        List<Office> offices = officeService.getAllOffices();
+    public String getAllOffices(Model model, @RequestParam(required = false) String search,
+                               @RequestParam(required = false) String filter,
+                               @RequestParam(required = false) String value) {
+        List<Office> offices;
+        
+        if (search != null && !search.isEmpty()) {
+            // General search
+            offices = officeService.searchOffices(search);
+            model.addAttribute("search", search);
+        } else if (filter != null && value != null && !value.isEmpty()) {
+            // Filter by specific field
+            switch (filter) {
+                case "city":
+                    offices = officeService.findByCity(value);
+                    break;
+                case "country":
+                    offices = officeService.findByCountry(value);
+                    break;
+                case "territory":
+                    offices = officeService.findByTerritory(value);
+                    break;
+                default:
+                    offices = officeService.getAllOffices();
+            }
+            model.addAttribute("filter", filter);
+            model.addAttribute("value", value);
+        } else {
+            // No search or filter, get all
+            offices = officeService.getAllOffices();
+        }
+        
         model.addAttribute("offices", offices);
-        return "offices/list"; // Template: src/main/resources/templates/offices/list.html
+        return "offices/list";
     }
 
-    // Create - Mostra il form per creare un nuovo ufficio
+    // Create - Show form for creating a new office
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("office", new Office());
-        return "offices/form"; // Template: src/main/resources/templates/offices/form.html
+        return "offices/form";
     }
 
-    // Create - Salva il nuovo ufficio
+    // Create - Save the new office
     @PostMapping
     public String createOffice(@ModelAttribute Office office) {
         officeService.createOffice(office);
-        return "redirect:/offices"; // Reindirizza alla lista
+        return "redirect:/offices";
     }
 
-    // Update - Mostra il form per modificare un ufficio
+    // Update - Show form for editing an office
     @GetMapping("/edit/{officeCode}")
     public String showEditForm(@PathVariable String officeCode, Model model) {
         Office office = officeService.getOfficeById(officeCode)
@@ -47,17 +76,17 @@ public class OfficeController {
         return "offices/form";
     }
 
-    // Update - Salva le modifiche all'ufficio
+    // Update - Save changes to an office
     @PostMapping("/update/{officeCode}")
     public String updateOffice(@PathVariable String officeCode, @ModelAttribute Office officeDetails) {
         officeService.updateOffice(officeCode, officeDetails);
-        return "redirect:/offices"; // Reindirizza alla lista
+        return "redirect:/offices";
     }
 
-    // Delete - Elimina un ufficio
+    // Delete - Delete an office
     @PostMapping("/delete/{officeCode}")
     public String deleteOffice(@PathVariable String officeCode) {
         officeService.deleteOffice(officeCode);
-        return "redirect:/offices"; // Reindirizza alla lista
+        return "redirect:/offices";
     }
 }
