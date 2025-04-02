@@ -23,12 +23,26 @@
             <input type="email" class="form-control" id="email" th:field="*{email}" required>
         </div>
         <div class="mb-3">
-            <label for="officeCode" class="form-label">Office Code</label>
-            <input type="text" class="form-control" id="officeCode" th:field="*{office.officeCode}" required>
+            <label for="officeCode" class="form-label">Office</label>
+            <select class="form-select" id="officeCode" th:field="*{office.officeCode}" required>
+                <option value="">Select an office</option>
+                <option th:each="office : ${offices}" 
+                        th:value="${office.officeCode}" 
+                        th:text="${office.city} + ' (' + ${office.officeCode} + ')'">Office Name</option>
+            </select>
         </div>
         <div class="mb-3">
-            <label for="reportsTo" class="form-label">Reports To (Employee ID)</label>
-            <input type="number" class="form-control" id="reportsTo" th:field="*{reportsTo?.employeeNumber}">
+            <label for="reportsTo" class="form-label">Reports To (Employee)</label>
+            <select class="form-select" id="reportsTo" name="reportsToId">
+                <option value="">None</option>
+                <option th:each="manager : ${employees}" 
+                        th:if="${manager.employeeNumber != employee.employeeNumber}"
+                        th:value="${manager.employeeNumber}" 
+                        th:text="${manager.firstName + ' ' + manager.lastName + ' (' + manager.jobTitle + ')'}"
+                        th:selected="${employee.reportsTo != null && employee.reportsTo.employeeNumber == manager.employeeNumber}">
+                    Manager Name
+                </option>
+            </select>
         </div>
         <div class="mb-3">
             <label for="jobTitle" class="form-label">Job Title</label>

@@ -1,7 +1,9 @@
 package com.example.Ufficio_Mngmnt.controller;
 
 import com.example.Ufficio_Mngmnt.model.Employee;
+import com.example.Ufficio_Mngmnt.model.Office;
 import com.example.Ufficio_Mngmnt.service.EmployeeService;
+import com.example.Ufficio_Mngmnt.service.OfficeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,9 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+    
+    @Autowired
+    private OfficeService officeService;
 
     // Read (all) - Lista di tutti i dipendenti
     @GetMapping
@@ -45,13 +50,21 @@ public class EmployeeController {
     // Create - Mostra form per nuovo dipendente
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("employee", new Employee());
+        Employee employee = new Employee();
+        // Ensure office is initialized
+        employee.setOffice(new Office());
+        model.addAttribute("employee", employee);
+        model.addAttribute("offices", officeService.getAllOffices());
+        model.addAttribute("employees", employeeService.getAllEmployees());
         return "employees/form"; // Template: src/main/resources/templates/employees/form.html
     }
 
     // Create - Salva nuovo dipendente
     @PostMapping
-    public String createEmployee(@ModelAttribute Employee employee) {
+    public String createEmployee(@ModelAttribute Employee employee, @RequestParam(required = false) Integer reportsToId) {
+        if (reportsToId != null) {
+            employeeService.getEmployeeById(reportsToId).ifPresent(employee::setReportsTo);
+        }
         employeeService.createEmployee(employee);
         return "redirect:/employees"; // Reindirizza alla lista
     }
@@ -61,13 +74,26 @@ public class EmployeeController {
     public String showEditForm(@PathVariable Integer employeeNumber, Model model) {
         Employee employee = employeeService.getEmployeeById(employeeNumber)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
+        // Ensure office is initialized if null
+        if (employee.getOffice() == null) {
+            employee.setOffice(new Office());
+        }
         model.addAttribute("employee", employee);
+        model.addAttribute("offices", officeService.getAllOffices());
+        model.addAttribute("employees", employeeService.getAllEmployees());
         return "employees/form"; // Riutilizza il form per creazione/modifica
     }
 
     // Update - Salva modifiche dipendente
     @PostMapping("/{employeeNumber}")
-    public String updateEmployee(@PathVariable Integer employeeNumber, @ModelAttribute Employee employeeDetails) {
+    public String updateEmployee(@PathVariable Integer employeeNumber, 
+                                @ModelAttribute Employee employeeDetails,
+                                @RequestParam(required = false) Integer reportsToId) {
+        if (reportsToId != null) {
+            employeeService.getEmployeeById(reportsToId).ifPresent(employeeDetails::setReportsTo);
+        } else {
+            employeeDetails.setReportsTo(null);
+        }
         employeeService.updateEmployee(employeeNumber, employeeDetails);
         return "redirect:/employees"; // Reindirizza alla lista
     }
