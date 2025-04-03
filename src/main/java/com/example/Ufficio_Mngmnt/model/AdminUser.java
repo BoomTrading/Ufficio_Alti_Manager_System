@@ -41,4 +41,6 @@ public class AdminUser {
     public enum Role {
         USER, MANAGER, ADMIN
     }
+
+    
 }

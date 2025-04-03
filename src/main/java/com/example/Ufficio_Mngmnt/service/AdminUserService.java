@@ -51,4 +51,9 @@ public class AdminUserService {
     public void deleteAdminUser(Integer userId) {
         adminUserRepository.deleteById(userId);
     }
+
+    // Read (by username) - alternative method name
+    public AdminUser findByUsername(String username) {
+        return adminUserRepository.findByUsername(username);
+    }
 }

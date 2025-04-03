@@ -1,108 +1,50 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Ufficio Management</title>
-    <!-- Bootstrap CSS per un design semplice -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
-          rel="stylesheet" 
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
-          crossorigin="anonymous">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        .error-message {
-            color: red;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
 </head>
 <body>
-    <div class="login-container">
-        <h2 class="text-center mb-4">Login</h2>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <h2 class="text-center mb-4">Login</h2>
 
-        <!-- Messaggio di errore se il login fallisce -->
-        <div th:if="${param.error}" class="alert alert-danger" role="alert">
-            Invalid username or password.
-        </div>
-
-        <!-- Messaggio di logout se presente -->
-        <div th:if="${param.logout}" class="alert alert-success" role="alert">
-            You have been logged out successfully.
-        </div>
-
-        <!-- Form di login -->
-        <form th:action="@{/login}" method="post" class="needs-validation" novalidate>
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" 
-                       class="form-control" 
-                       id="username" 
-                       name="username" 
-                       required 
-                       placeholder="Enter your username">
-                <div class="invalid-feedback">
-                    Please enter your username.
+                <!-- Messaggio di errore se il login fallisce -->
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                    Username o password non validi.
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" 
-                       class="form-control" 
-                       id="password" 
-                       name="password" 
-                       required 
-                       placeholder="Enter your password">
-                <div class="invalid-feedback">
-                    Please enter your password.
+                <!-- Messaggio di logout -->
+                <div th:if="${param.logout}" class="alert alert-success" role="alert">
+                    Logout effettuato con successo.
                 </div>
-            </div>
 
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Login</button>
+                <form th:action="@{/login}" method="post" class="card p-4">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                        <label class="form-check-label" for="remember-me">Ricordami</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Accedi</button>
+                </form>
             </div>
-        </form>
-
-        <!-- Link opzionale per registrazione (se previsto) -->
-        <p class="text-center mt-3">
-            Don't have an account? <a href="#" th:href="@{/register}">Register</a>
-        </p>
+        </div>
     </div>
 
-    <!-- Bootstrap JS per la validazione del form -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
-    <script>
-        // Validazione del form con Bootstrap
-        (function () {
-            'use strict';
-            const forms = document.querySelectorAll('.needs-validation');
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
-    </script>
 </body>
 </html>
